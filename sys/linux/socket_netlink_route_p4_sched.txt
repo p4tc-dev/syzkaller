@@ -4,7 +4,6 @@ include <uapi/linux/rtnetlink.h>
 include <uapi/linux/pkt_cls.h>
 include <uapi/linux/pkt_sched.h>
 include <uapi/linux/p4tc.h>
-include <uapi/linux/tc_act/tc_metact.h>
 
 resource sock_nl_route_p4[sock_netlink]
 socket$nl_route_p4(domain const[AF_NETLINK], type const[SOCK_RAW], proto const[NETLINK_ROUTE]) sock_nl_route_p4
@@ -23,25 +22,25 @@ netlink_msg_p4_pipeline [
 	delp4pipeline	netlink_msg[RTM_DELP4TEMPLATE, p4tcmsg[P4TC_OBJ_PIPELINE], p4tc_root[p4tc_pipeline_policy]]
 ] [varlen]
 
-netlink_msg_route_p4_sched [
+#netlink_msg_route_p4_sched [
 	newp4metadata	netlink_msg[RTM_CREATEP4TEMPLATE, p4tcmsg[2], p4tc_root[p4tc_metadata_policy]]
 	getp4metadata	netlink_msg[RTM_GETP4TEMPLATE, p4tcmsg[2], p4tc_root[p4tc_metadata_policy]]
 	delp4metadata	netlink_msg[RTM_DELP4TEMPLATE, p4tcmsg[2], p4tc_root[p4tc_metadata_policy]]
-	newp4tclass	netlink_msg[RTM_CREATEP4TEMPLATE, p4tcmsg[P4TC_OBJ_TABLE_CLASS], p4tc_root[p4tc_tclass_policy]]
-	getp4tclass	netlink_msg[RTM_GETP4TEMPLATE, p4tcmsg[P4TC_OBJ_TABLE_CLASS], p4tc_root[p4tc_tclass_policy]]
-	delp4tclass	netlink_msg[RTM_DELP4TEMPLATE, p4tcmsg[P4TC_OBJ_TABLE_CLASS], p4tc_root[p4tc_tclass_policy]]
-	newp4tinst	netlink_msg[RTM_CREATEP4TEMPLATE, p4tcmsg[P4TC_OBJ_TABLE_INST], p4tc_root[p4tc_tinst_policy]]
-	getp4tinst	netlink_msg[RTM_GETP4TEMPLATE, p4tcmsg[P4TC_OBJ_TABLE_INST], p4tc_root[p4tc_tinst_policy]]
-	delp4tinst	netlink_msg[RTM_DELP4TEMPLATE, p4tcmsg[P4TC_OBJ_TABLE_INST], p4tc_root[p4tc_tinst_policy]]
-	newp4hdrfield	netlink_msg[RTM_CREATEP4TEMPLATE, p4tcmsg[5], p4tc_root[p4tc_hdr_field_policy]]
-	getp4hdrfield	netlink_msg[RTM_GETP4TEMPLATE, p4tcmsg[5], p4tc_root[p4tc_hdr_field_policy]]
-	delp4hdrfield	netlink_msg[RTM_DELP4TEMPLATE, p4tcmsg[5], p4tc_root[p4tc_hdr_field_policy]]
+	newp4hdrfield	netlink_msg[RTM_CREATEP4TEMPLATE, p4tcmsg[3], p4tc_root[p4tc_hdr_field_policy]]
+	getp4hdrfield	netlink_msg[RTM_GETP4TEMPLATE, p4tcmsg[3], p4tc_root[p4tc_hdr_field_policy]]
+	delp4hdrfield	netlink_msg[RTM_DELP4TEMPLATE, p4tcmsg[3], p4tc_root[p4tc_hdr_field_policy]]
 	newp4acttmpl	netlink_msg[RTM_CREATEP4TEMPLATE, p4tcmsg[P4TC_OBJ_ACT], p4tc_root[p4tc_tmpl_action_policy]]
 	getp4acttmpl	netlink_msg[RTM_GETP4TEMPLATE, p4tcmsg[P4TC_OBJ_ACT], p4tc_root[p4tc_tmpl_action_policy]]
 	delp4acttmpl	netlink_msg[RTM_DELP4TEMPLATE, p4tcmsg[P4TC_OBJ_ACT], p4tc_root[p4tc_tmpl_action_policy]]
+	newp4table	netlink_msg[RTM_CREATEP4TEMPLATE, p4tcmsg[P4TC_OBJ_TABLE], p4tc_root[p4tc_table_policy]]
+	getp4table	netlink_msg[RTM_GETP4TEMPLATE, p4tcmsg[P4TC_OBJ_TABLE], p4tc_root[p4tc_table_policy]]
+	delp4table	netlink_msg[RTM_DELP4TEMPLATE, p4tcmsg[P4TC_OBJ_TABLE], p4tc_root[p4tc_table_policy]]
 	newp4tabentry	netlink_msg[RTM_CREATEP4TBENT, p4tcmsg[P4TC_OBJ_TABLE_ENTRY], p4tc_root[p4tc_tabentry_policy]]
 	getp4tabentry	netlink_msg[RTM_GETP4TBENT, p4tcmsg[P4TC_OBJ_TABLE_ENTRY], p4tc_root[p4tc_tabentry_policy]]
 	delp4tabentry	netlink_msg[RTM_DELP4TBENT, p4tcmsg[P4TC_OBJ_TABLE_ENTRY], p4tc_root[p4tc_tabentry_policy]]
+	newp4register   netlink_msg[RTM_CREATEP4TEMPLATE, p4tcmsg[P4TC_OBJ_REGISTER], p4tc_root[p4tc_register_policy]]
+	getp4register   netlink_msg[RTM_GETP4TEMPLATE, p4tcmsg[P4TC_OBJ_REGISTER], p4tc_root[p4tc_register_policy]]
+	delp4register   netlink_msg[RTM_DELP4TEMPLATE, p4tcmsg[P4TC_OBJ_REGISTER], p4tc_root[p4tc_register_policy]]
 ] [varlen]
 
 type p4tcmsg[P4_OBJ_TYPE] {
@@ -61,9 +60,9 @@ type p4tc_policy[PARAMS] {
 } [packed, align[4]]
 
 p4tc_pipeline_policy {
-	P4TC_PIPELINE_MAXRULES		nlattr[P4TC_PIPELINE_MAXRULES, int32[0:513]]
-	P4TC_PIPELINE_NUMTCLASSES	nlattr[P4TC_PIPELINE_NUMTCLASSES, int16[0:33]]
-#P4TC_PIPELINE_STATE           nlattr[P4TC_PIPELINE_STATE, const[1, int8]]
+	P4TC_PIPELINE_MAXRULES		nlattr[P4TC_PIPELINE_MAXRULES, int32]
+	P4TC_PIPELINE_NUMTABLES		nlattr[P4TC_PIPELINE_NUMTABLES, int16]
+	#P4TC_PIPELINE_STATE           nlattr[P4TC_PIPELINE_STATE, const[1, int8]]
 	P4TC_PIPELINE_PREACTIONS	nlnest[P4TC_PIPELINE_PREACTIONS, array[p4tc_actions, 1:4]]
 	P4TC_PIPELINE_POSTACTIONS	nlnest[P4TC_PIPELINE_POSTACTIONS, array[p4tc_actions, 1:4]]
 } [packed, align[4]]
@@ -78,7 +77,7 @@ type p4tc_action_policy[NAME, VALUES] {
 
 # One of these actions
 p4tc_actions [
-#action_gact    nlattr_tca_actions[p4tc_action_policy["gact", gact_policy]]
+	#action_gact    nlattr_tca_actions[p4tc_action_policy["gact", gact_policy]]
 	action_metact	nlattr_tca_actions[p4tc_action_policy["metact", p4tc_metact_policy]]
 ] [varlen]
 
@@ -93,13 +92,15 @@ p4tc_metadata_policy {
 	P4TC_META_SIZE	nlattr[P4TC_META_SIZE, metadata_size_params]
 } [packed, align[4]]
 
-p4tc_table_class_parm {
-	tbc_keysz	int32
-	tbc_count	int32
-	tbc_max_entries	int32
-	tbc_max_masks	int32
-	tbc_default_key	int32
-	tbc_flags	int32
+p4tc_table_param {
+	tbl_keysz	int32
+	tbl_max_entries	int32
+	tbl_max_masks	int32
+	tbl_default_key	int32
+	tbl_flags	int32
+	tbl_num_entries	int32
+	tbl_permissions int16
+	PAD0		int16
 } [packed, align[4]]
 
 p4tc_table_key {
@@ -107,19 +108,23 @@ p4tc_table_key {
 	P4TC_KEY_ACT	nlnest[P4TC_KEY_ACT, array[p4tc_actions, 1:4]]
 } [packed, align[4]]
 
-p4tc_tclass_policy {
-	P4TC_TCLASS_NAME	nlattr[P4TC_TCLASS_NAME, string]
-	P4TC_TCLASS_INFO	nlattr[P4TC_TCLASS_INFO, p4tc_table_class_parm]
-	P4TC_TCLASS_PREACTIONS	nlnest[P4TC_TCLASS_PREACTIONS, array[p4tc_actions, 1:4]]
-	P4TC_TCLASS_KEYS	nlnest[P4TC_TCLASS_KEYS, array[nlattr_p4tc_batch[p4tc_table_key], 1:4]]
-	P4TC_TCLASS_POSTACTIONS	nlnest[P4TC_TCLASS_POSTACTIONS, array[p4tc_actions, 1:4]]
+p4tc_table_policy {
+	P4TC_TABLE_NAME		nlattr[P4TC_TABLE_NAME, string]
+	P4TC_TABLE_INFO		nlattr[P4TC_TABLE_INFO, p4tc_table_param]
+	P4TC_TABLE_PREACTIONS	nlnest[P4TC_TABLE_PREACTIONS, array[p4tc_actions, 1:4]]
+	P4TC_TABLE_KEYS		nlnest[P4TC_TABLE_KEYS, array[nlattr_p4tc_batch[p4tc_table_key], 1:4]]
+	P4TC_TABLE_POSTACTIONS	nlnest[P4TC_TABLE_POSTACTIONS, array[p4tc_actions, 1:4]]
+#check
+#	P4TC_TABLE_DEFAULT_HIT	nlnest[P4TC_TABLE_DEFAULT_HIT, array[p4tc_actions, 1:4]]
+#	P4TC_TABLE_DEFAULT_MISS	nlnest[P4TC_TABLE_DEFAULT_MISS, array[p4tc_actions, 1:4]]
+#	P4TC_TABLE_OPT_ENTRY	nlnest[P4TC_TABLE_OPT_ENTRY, array[p4tc_actions, 1:4]]
 } [packed, align[4]]
 
-p4tc_tinst_policy {
-	P4TC_TINST_CLASS	nlattr[P4TC_TINST_CLASS, string]
-	P4TC_TINST_NAME		nlattr[P4TC_TINST_NAME, string]
-	P4TC_TINST_MAX_ENTRIES	nlattr[P4TC_TINST_MAX_ENTRIES, int32]
-} [packed, align[4]]
+#p4tc_tinst_policy {
+#	P4TC_TINST_CLASS	nlattr[P4TC_TINST_CLASS, string]
+#	P4TC_TINST_NAME		nlattr[P4TC_TINST_NAME, string]
+#	P4TC_TINST_MAX_ENTRIES	nlattr[P4TC_TINST_MAX_ENTRIES, int32]
+#} [packed, align[4]]
 
 p4tc_header_field_ty {
 	startbit	int16
@@ -133,10 +138,28 @@ p4tc_hdr_field_policy {
 	P4TC_HDRFIELD_PARSER_NAME	nlattr[P4TC_HDRFIELD_PARSER_NAME, string]
 } [packed, align[4]]
 
+p4tc_u_operand {
+	immedv		int32
+	immedv2		int32
+	pipeid		int32
+	oper_typ	int8		
+	oper_datatype	int8
+	oper_cbitsize	int8
+	oper_startbit	int8
+	oper_endbit	int8
+	oper_flags	int8
+}
+
+p4tc_act_param_values {
+	P4TC_ACT_PARAMS_VALUE_RAW	nlattr[P4TC_ACT_PARAMS_VALUE_RAW, int8]
+#check
+	P4TC_ACT_PARAMS_VALUE_OPND	nlnest[P4TC_ACT_PARAMS_VALUE_OPND , array[p4tc_u_operand,1:4]]
+}
+
 p4tc_action_params_policy {
 	P4TC_ACT_PARAMS_NAME	nlattr[P4TC_ACT_PARAMS_NAME, string]
 	P4TC_ACT_PARAMS_ID	nlattr[P4TC_ACT_PARAMS_ID, p4tc_id]
-	P4TC_ACT_PARAMS_VALUE	nlattr[P4TC_ACT_PARAMS_VALUE, array[int8]]
+	P4TC_ACT_PARAMS_VALUE	nlnest[P4TC_ACT_PARAMS_VALUE, array[p4tc_act_param_values,1:4]]
 	P4TC_ACT_PARAMS_MASK	nlattr[P4TC_ACT_PARAMS_MASK, array[int8]]
 	P4TC_ACT_PARAMS_TYPE	nlattr[P4TC_ACT_PARAMS_TYPE, int32[0:18]]
 } [packed, align[4]]
@@ -153,19 +176,44 @@ p4tc_tmpl_action_policy {
 	P4TC_ACT_NAME	nlattr[P4TC_ACT_NAME, string]
 	P4TC_ACT_PARMS	nlnest[P4TC_ACT_PARMS, array[nlattr_p4tc_batch[p4tc_action_params_policy], 1:4]]
 	P4TC_ACT_OPT	nlattr[P4TC_ACT_OPT, tc_act_dyna]
-	P4TC_ACT_LIST	nlnest[P4TC_ACT_METACT_LIST, array[nlattr_tca_actions[tcf_action_policy["metact", p4tc_metact_policy]], 1:4]]
+#check
+#	P4TC_ACT_CMDS_LIST	nlnest[P4TC_ACT_METACT_LIST, array[nlattr_tca_actions[tcf_action_policy["metact", p4tc_metact_policy]], 1:4]]
+	P4TC_ACT_ACTIVE		nlattr[P4TC_ACT_ACTIVE, const[1, int8]]
 } [packed, align[4]]
 
-# Needs sealed pipeline
+p4tc_table_entry_tm {
+	created		int64
+	lastused	int64
+	firstused	int64
+}
+
+## Needs sealed pipeline
 p4tc_tabentry_policy {
-	P4TC_ENTRY_TBCNAME	nlattr[P4TC_TCLASS_NAME, string]
-	P4TC_ENTRY_TINAME	nlattr[P4TC_TINST_NAME, string]
+	P4TC_ENTRY_TBLNAME	nlattr[P4TC_TABLE_NAME, string]
 	P4TC_ENTRY_KEY_BLOB	nlattr[P4TC_ENTRY_KEY_BLOB, array[int8]]
 	P4TC_ENTRY_MASK_BLOB	nlattr[P4TC_ENTRY_MASK_BLOB, array[int8]]
 	P4TC_ENTRY_PRIO		nlattr[P4TC_ENTRY_PRIO, int32]
 	P4TC_ENTRY_ACT		nlnest[P4TC_ENTRY_ACT, array[p4tc_actions, 1:4]]
+	P4TC_ENTRY_TM		nlattr[P4TC_ENTRY_TM, p4tc_table_entry_tm]
 	P4TC_ENTRY_WHODUNNIT	nlattr[P4TC_ENTRY_WHODUNNIT, int8]
+	P4TC_ENTRY_PERMISSIONS	nlattr[P4TC_ENTRY_PERMISSIONS, int16]
 } [packed, align[4]]
+
+p4tc_u_register {
+	num_elems	int32
+	datatype	int32
+	index		int32
+	startbit	int16
+	endbit		int16
+	flags		int16
+}
+
+p4tc_register_policy {
+	P4TC_REGISTER_NAME	nlattr[P4TC_REGISTER_NAME, string]
+	P4TC_REGISTER_INFO	nlattr[P4TC_REGISTER_INFO, p4tc_u_register]
+#check
+	P4TC_REGISTER_VALUE	nlattr[P4TC_REGISTER_VALUE, ]
+} [packed, alogn[4]]
 
 tca_u_meta_operand {
 	immedv		int32
